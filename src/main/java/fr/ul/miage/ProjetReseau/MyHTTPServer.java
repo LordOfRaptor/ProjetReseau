@@ -7,6 +7,7 @@ package fr.ul.miage.ProjetReseau;
 
 import java.io.*;
 import java.net.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
@@ -64,7 +65,8 @@ public class MyHTTPServer extends Thread {
 					String fileName = httpQueryString.replaceFirst("/", "");
 					fileName = URLDecoder.decode(fileName);
 					System.out.println(fileName);
-					InputStream iStream =  Main.class.getResourceAsStream(fileName);
+					InputStream iStream =  Thread.currentThread().getContextClassLoader().getResourceAsStream("fr/ul/miage/ProjetReseau/"+fileName);
+					
 					if(iStream != null) {
 						sendResponse(200, fileName, true);
 					}

@@ -1,9 +1,9 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>fr.ul.miage</groupId>
-  <artifactId>hello</artifactId>
+  <artifactId>ProjetReseau</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>hello</name>
+  <name>ProjetReseau</name>
   <description>Exemple de projet Maven avec éclipse</description>
   <properties>
   <!-- Le code source en UTF8 -->
@@ -11,7 +11,7 @@
   <!-- Où stocker la distribution binaire -->
   <project.bindist.dir>${project.basedir}/bindist</project.bindist.dir>
   <!-- Nom de la classe principale -->
-  <project.main.classname>${project.groupId}.${project.artifactId}.Main</project.main.classname>
+  <project.main.classname>${project.groupId}.${project.artifactId}.MyHTTPServer</project.main.classname>
   <!-- Nom de la classe principale -->
   <project.bin.appname>main</project.bin.appname>
   </properties>
