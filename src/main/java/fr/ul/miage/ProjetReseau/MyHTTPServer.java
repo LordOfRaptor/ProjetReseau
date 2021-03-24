@@ -13,11 +13,18 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
+
+import fr.ul.miage.ProjetReseau.Page.WebView;
+import fr.ul.miage.ProjetReseau.Page.WebViewForbidden;
+import fr.ul.miage.ProjetReseau.Page.WebViewNotFound;
+import fr.ul.miage.ProjetReseau.Page.WebViewSucces;
+
+
 public class MyHTTPServer extends Thread {
 
-	static final String HTML_START = "<html>" + "<title>HTTP Server in java</title>" + "<body>";
+	public static final String HTML_START = "<!DOCTYPE HTML><html>" + "<title>HTTP Server in java</title>" + "<body>";
 
-	static final String HTML_END = "</body>" + "</html>";
+	public static final String HTML_END = "</body>" + "</html>";
 
 	Socket connectedClient = null;
 	BufferedReader inFromClient = null;
@@ -50,103 +57,47 @@ public class MyHTTPServer extends Thread {
 
 			System.out.println("The HTTP request string is ....");
 			while (inFromClient.ready()) {
-				// Read the HTTP complete HTTP Query
 				responseBuffer.append(requestString + "<BR>");
 				System.out.println(requestString);
 				requestString = inFromClient.readLine();
 			}
-
+			
 			if (httpMethod.equals("GET")) {
-				if (httpQueryString.equals("/")) {
-					// The default home page
-					sendResponse(200, responseBuffer.toString(), false);
-				} else {
-					//This is interpreted as a file name
-					String fileName = httpQueryString.replaceFirst("/", "");
-					fileName = URLDecoder.decode(fileName);
-					System.out.println(fileName);
-					InputStream iStream =  Thread.currentThread().getContextClassLoader().getResourceAsStream("fr/ul/miage/ProjetReseau/"+fileName);
-					
-					if(iStream != null) {
-						sendResponse(200, fileName, true);
+				
+				String fileName = httpQueryString.replaceFirst("/", "");
+				fileName = URLDecoder.decode(fileName,StandardCharsets.UTF_8);
+				// get the question mark
+
+				String[] seperatorQuestionMark = fileName.split("\\?");
+				
+				var file = seperatorQuestionMark[0];
+				var query = (seperatorQuestionMark.length == 1) ? null : seperatorQuestionMark[1];
+				
+				InputStream iStream = Thread.currentThread().getContextClassLoader()
+						.getResourceAsStream("fr/ul/miage/ProjetReseau/" + file);
+				
+				if (iStream != null) {
+				
+					if(Thread.currentThread().getContextClassLoader()
+							.getResourceAsStream("fr/ul/miage/ProjetReseau/" + file + "/.htpasswd") != null) {
+						
+						new WebViewForbidden(inFromClient, outToClient).sendResponse(file, query);
+						
 					}
 					else {
-						sendResponse(404, "<b>The Requested resource not found ...."
-								+ "Usage: http://127.0.0.1:5000 or http://127.0.0.1:5000/</b>", false);
+						new WebViewSucces(inFromClient, outToClient).sendResponse(file,query);
 					}
-						
 					
+				} else {
+					new WebViewNotFound(inFromClient, outToClient).sendResponse("<p> 404 not found </p>", query);
 				}
+
 			} else
-				sendResponse(404, "<b>The Requested resource not found ...."
-						+ "Usage: http://127.0.0.1:5000 or http://127.0.0.1:5000/</b>", false);
+				new WebViewNotFound(inFromClient, outToClient).sendResponse("<p> 404 not found </p>", null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-
-	public void sendResponse(int statusCode, String responseString, boolean isFile) throws Exception {
-
-		String statusLine = null;
-		String serverdetails = "Server: Java HTTPServer";
-		String contentLengthLine = null;
-		String fileName = null;
-		String contentTypeLine = "Content-Type: text/html" + "\r\n";
-		FileInputStream fin = null;
-
-		if (statusCode == 200)
-			statusLine = "HTTP/1.1 200 OK" + "\r\n";
-		else
-			statusLine = "HTTP/1.1 404 Not Found" + "\r\n";
-
-		if (isFile) {
-			fileName = responseString;
-			Path temp = Files.createTempFile("resource-", ".ext");
-			Files.copy(Main.class.getResourceAsStream(fileName), temp, StandardCopyOption.REPLACE_EXISTING);
-			fin = new FileInputStream(temp.toString());
-			contentLengthLine = "Content-Length: " + Integer.toString(fin.available()) + "\r\n";
-			if (!fileName.endsWith(".htm") && !fileName.endsWith(".html"))
-				contentTypeLine = "Content-Type: \r\n";
-		} else {
-			responseString = MyHTTPServer.HTML_START + responseString + MyHTTPServer.HTML_END;
-			contentLengthLine = "Content-Length: " + responseString.length() + "\r\n";
-		}
-
-		outToClient.writeBytes(statusLine);
-		outToClient.writeBytes(serverdetails);
-		outToClient.writeBytes(contentTypeLine);
-		outToClient.writeBytes(contentLengthLine);
-		outToClient.writeBytes("Connection: close\r\n");
-		outToClient.writeBytes("\r\n");
-
-		if (isFile)
-			sendFile(fin, outToClient);
-		else
-			outToClient.writeBytes(responseString);
-
-		outToClient.close();
-	}
 	
 	
-
-	public void sendFile(FileInputStream fin, DataOutputStream out) throws Exception {
-		byte[] buffer = new byte[1024];
-		int bytesRead;
-
-		while ((bytesRead = fin.read(buffer)) != -1) {
-			out.write(buffer, 0, bytesRead);
-		}
-		fin.close();
-	}
-
-	public static void main(String args[]) throws Exception {
-
-		ServerSocket Server = new ServerSocket(5000, 10, InetAddress.getByName("127.0.0.1"));
-		System.out.println("TCPServer Waiting for client on port 5000");
-
-		while (true) {
-			Socket connected = Server.accept();
-			(new MyHTTPServer(connected)).start();
-		}
-	}
 }

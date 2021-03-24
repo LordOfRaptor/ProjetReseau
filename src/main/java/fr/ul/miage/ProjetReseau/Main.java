@@ -2,11 +2,14 @@ package fr.ul.miage.ProjetReseau;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Date;
 
 public class Main {
@@ -15,63 +18,15 @@ public class Main {
 	 static final int port=8080;
 	 static final String newLine="\r\n";
 
-	 /*public static void main(String[] args)
+	 public static void main(String[] args) throws UnknownHostException, IOException
 	 {
-	  try
-	  {
-	   ServerSocket socket=new ServerSocket(port);
+		 ServerSocket Server = new ServerSocket(port, 10, InetAddress.getByName("192.168.1.21"));
+			System.out.println("TCPServer Waiting for client on port " + port);
 
-	   while (true){
-	    Socket connection=socket.accept();
-
-	    try
-	    {
-	     BufferedReader in=new BufferedReader(new InputStreamReader(connection.getInputStream()));
-	     OutputStream out=new BufferedOutputStream(connection.getOutputStream());
-	     PrintStream pout=new PrintStream(out);
-
-	     // read first line of request
-	     String request=in.readLine();
-	     if (request==null) continue;
-
-	     // we ignore the rest
-	     while (true)
-	     {
-	      String ignore=in.readLine();
-	      if (ignore==null || ignore.length()==0) break;
-	     }
-	     System.out.println(request);
-	     if (!request.startsWith("GET ") ||
-	         !(request.endsWith(" HTTP/1.0") || request.endsWith(" HTTP/1.1")))
-	     {
-	      // bad request
-	      pout.print("HTTP/1.0 400 Bad Request"+newLine+newLine);
-	     }
-	     else
-	     {
-	      String response="Hello, World!";
-
-	      pout.print(
-	       "HTTP/1.0 200 OK"+newLine+
-	       "Content-Type: text/plain"+newLine+
-	       "Date: "+new Date()+newLine+
-	       "Content-length: "+response.length()+newLine+newLine+
-	       response
-	      );
-	     }
-
-	     pout.close();
-	    }
-	    catch (Throwable tri)
-	    {
-	     System.err.println("Error handling request: "+tri);
-	    }
-	   }
-	  }
-	  catch (Throwable tr)
-	  {
-	   System.err.println("Could not start server: "+tr);
-	  }
-	 }*/
+			while (true) {
+				Socket connected = Server.accept();
+				(new MyHTTPServer(connected)).start();
+			}
+	 }
 
 }
