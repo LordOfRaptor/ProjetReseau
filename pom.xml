@@ -11,7 +11,7 @@
   <!-- Où stocker la distribution binaire -->
   <project.bindist.dir>${project.basedir}/bindist</project.bindist.dir>
   <!-- Nom de la classe principale -->
-  <project.main.classname>${project.groupId}.${project.artifactId}.MyHTTPServer</project.main.classname>
+  <project.main.classname>${project.groupId}.${project.artifactId}.Main</project.main.classname>
   <!-- Nom de la classe principale -->
   <project.bin.appname>main</project.bin.appname>
   </properties>

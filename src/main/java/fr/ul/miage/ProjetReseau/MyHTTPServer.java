@@ -37,7 +37,9 @@ public class MyHTTPServer extends Thread {
 	public void run() {
 
 		try {
-
+			WebView wv;
+			String file = null;
+			String query = null;
 			System.out.println("The Client " + connectedClient.getInetAddress() + ":" + connectedClient.getPort()
 					+ " is connected");
 
@@ -70,8 +72,8 @@ public class MyHTTPServer extends Thread {
 
 				String[] seperatorQuestionMark = fileName.split("\\?");
 				
-				var file = seperatorQuestionMark[0];
-				var query = (seperatorQuestionMark.length == 1) ? null : seperatorQuestionMark[1];
+				file = seperatorQuestionMark[0];
+				query = (seperatorQuestionMark.length == 1) ? null : seperatorQuestionMark[1];
 				
 				InputStream iStream = Thread.currentThread().getContextClassLoader()
 						.getResourceAsStream("fr/ul/miage/ProjetReseau/" + file);
@@ -81,19 +83,22 @@ public class MyHTTPServer extends Thread {
 					if(Thread.currentThread().getContextClassLoader()
 							.getResourceAsStream("fr/ul/miage/ProjetReseau/" + file + "/.htpasswd") != null) {
 						
-						new WebViewForbidden(inFromClient, outToClient).sendResponse(file, query);
+						wv = new WebViewForbidden(inFromClient, outToClient); //.sendResponse(file, query);
 						
 					}
 					else {
-						new WebViewSucces(inFromClient, outToClient).sendResponse(file,query);
+						wv = new WebViewSucces(inFromClient, outToClient); //.sendResponse(file,query);
 					}
 					
 				} else {
-					new WebViewNotFound(inFromClient, outToClient).sendResponse("<p> 404 not found </p>", query);
+					wv = new WebViewNotFound(inFromClient, outToClient); //.sendResponse("<p> 404 not found </p>", query);
 				}
-
-			} else
-				new WebViewNotFound(inFromClient, outToClient).sendResponse("<p> 404 not found </p>", null);
+				wv.sendResponse(file, query);
+			} else {
+				wv =  new WebViewNotFound(inFromClient, outToClient);//.sendResponse("<p> 404 not found </p>", null);
+				wv.sendResponse(file, query);
+			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

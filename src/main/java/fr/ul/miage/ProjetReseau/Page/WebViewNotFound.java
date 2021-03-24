@@ -19,10 +19,14 @@ public class WebViewNotFound extends WebView {
 		super(in, out);
 	}
 	
+	@Override
+	public void sendResponse(String responseString, String query) throws IOException {
+		// TODO Auto-generated method stub
+		sendResponse("<p> 404 not found </p>");
+	}
 	
 	@Override
 	protected void sendResponse(String responseString) throws IOException {
-		
 		String statusLine = "HTTP/1.1 404 Not Found" + "\r\n";
 		String serverdetails = "Server: Java HTTPServer";
 		String contentLengthLine = null;
