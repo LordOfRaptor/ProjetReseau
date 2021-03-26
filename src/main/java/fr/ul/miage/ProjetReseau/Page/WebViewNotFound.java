@@ -10,7 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 
-import fr.ul.miage.ProjetReseau.MyHTTPServer;
+import fr.ul.miage.ProjetReseau.HTTPServer;
 
 public class WebViewNotFound extends WebView {
 	
@@ -30,12 +30,11 @@ public class WebViewNotFound extends WebView {
 		String statusLine = "HTTP/1.1 404 Not Found" + "\r\n";
 		String serverdetails = "Server: Java HTTPServer";
 		String contentLengthLine = null;
-		String fileName = null;
 		String contentTypeLine = "Content-Type: text/html" + "\r\n";
 		FileInputStream fin = null;
 
 		
-		responseString = MyHTTPServer.HTML_START + responseString + MyHTTPServer.HTML_END;
+		responseString = HTTPServer.HTML_START + responseString + HTTPServer.HTML_END;
 		contentLengthLine = "Content-Length: " + responseString.length() + "\r\n";
 		
 		

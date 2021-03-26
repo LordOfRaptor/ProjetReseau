@@ -9,7 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
-import fr.ul.miage.ProjetReseau.MyHTTPServer;
+import fr.ul.miage.ProjetReseau.HTTPServer;
 
 public class WebViewSucces extends WebView {
 	
@@ -34,6 +34,7 @@ public class WebViewSucces extends WebView {
 		Files.copy(Thread.currentThread().getContextClassLoader().getResourceAsStream(RESOURCES_LINK+responseString), temp, StandardCopyOption.REPLACE_EXISTING);
 		fin = new FileInputStream(temp.toString());
 		contentLengthLine = "Content-Length: " + Integer.toString(fin.available()) + "\r\n";
+		
 		if (!responseString.endsWith(".htm") && !responseString.endsWith(".html"))
 			contentTypeLine = "Content-Type: \r\n";
 		

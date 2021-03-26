@@ -8,9 +8,6 @@ package fr.ul.miage.ProjetReseau;
 import java.io.*;
 import java.net.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.*;
 
 
@@ -20,17 +17,18 @@ import fr.ul.miage.ProjetReseau.Page.WebViewNotFound;
 import fr.ul.miage.ProjetReseau.Page.WebViewSucces;
 
 
-public class MyHTTPServer extends Thread {
+public class HTTPServer extends Thread {
 
-	public static final String HTML_START = "<!DOCTYPE HTML><html>" + "<title>HTTP Server in java</title>" + "<body>";
+	public static final String HTML_START = "<!DOCTYPE HTML><html><title>HTTP Server in java</title><body>";
 
-	public static final String HTML_END = "</body>" + "</html>";
+	public static final String HTML_END = "</body></html>";
 
 	Socket connectedClient = null;
 	BufferedReader inFromClient = null;
 	DataOutputStream outToClient = null;
+	private HashMap<String, String> header = new HashMap<>();
 
-	public MyHTTPServer(Socket client) {
+	public HTTPServer(Socket client) {
 		connectedClient = client;
 	}
 
@@ -62,7 +60,12 @@ public class MyHTTPServer extends Thread {
 				responseBuffer.append(requestString + "<BR>");
 				System.out.println(requestString);
 				requestString = inFromClient.readLine();
+				if(requestString.contains(":")) {
+					String [] headerSeparator = requestString.split(":");
+					header.put(headerSeparator[0], headerSeparator[1]);
+				}
 			}
+			System.out.println(header);
 			
 			if (httpMethod.equals("GET")) {
 				

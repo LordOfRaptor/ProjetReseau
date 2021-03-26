@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
-import fr.ul.miage.ProjetReseau.MyHTTPServer;
+import fr.ul.miage.ProjetReseau.HTTPServer;
 
 public class WebViewForbidden extends WebView{
 
@@ -22,12 +22,11 @@ public class WebViewForbidden extends WebView{
 		String statusLine = "HTTP/1.1 401 Forbidden" + "\r\n";
 		String serverdetails = "Server: Java HTTPServer";
 		String contentLengthLine = null;
-		String fileName = null;
 		String contentTypeLine = "Content-Type: text/html" + "\r\n";
 		FileInputStream fin = null;
 
 		
-		responseString = MyHTTPServer.HTML_START + responseString + MyHTTPServer.HTML_END;
+		responseString = HTTPServer.HTML_START + responseString + HTTPServer.HTML_END;
 		contentLengthLine = "Content-Length: " + responseString.length() + "\r\n";
 		
 		
