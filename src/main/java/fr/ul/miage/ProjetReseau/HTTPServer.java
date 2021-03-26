@@ -76,7 +76,6 @@ public class HTTPServer extends Thread {
 				String[] seperatorQuestionMark = fileName.split("\\?");
 				
 				file = seperatorQuestionMark[0];
-				query = (seperatorQuestionMark.length == 1) ? null : seperatorQuestionMark[1];
 				
 				InputStream iStream = Thread.currentThread().getContextClassLoader()
 						.getResourceAsStream("fr/ul/miage/ProjetReseau/" + file);
@@ -85,8 +84,12 @@ public class HTTPServer extends Thread {
 				
 					if(Thread.currentThread().getContextClassLoader()
 							.getResourceAsStream("fr/ul/miage/ProjetReseau/" + file + "/.htpasswd") != null) {
+						if(header.containsKey("Authorization")) {
+							query = header.get("Authorization");
+						}
 						
 						wv = new WebViewForbidden(inFromClient, outToClient); //.sendResponse(file, query);
+						
 						
 					}
 					else {
