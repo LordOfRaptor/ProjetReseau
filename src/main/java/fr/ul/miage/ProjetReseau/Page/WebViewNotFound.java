@@ -15,23 +15,22 @@ import fr.ul.miage.ProjetReseau.HTTPServer;
 public class WebViewNotFound extends WebView {
 	
 	
-	public WebViewNotFound(BufferedReader in, DataOutputStream out) {
-		super(in, out);
+	public WebViewNotFound(BufferedReader in, DataOutputStream out,String host) {
+		super(in, out,host);
 	}
 	
 	@Override
 	public void sendResponse(String responseString, String query) throws IOException {
-		// TODO Auto-generated method stub
 		sendResponse("<p> 404 not found </p>");
 	}
 	
 	@Override
 	protected void sendResponse(String responseString) throws IOException {
 		String statusLine = "HTTP/1.1 404 Not Found" + "\r\n";
+		System.out.println(statusLine);
 		String serverdetails = "Server: Java HTTPServer";
 		String contentLengthLine = null;
 		String contentTypeLine = "Content-Type: text/html" + "\r\n";
-		FileInputStream fin = null;
 
 		
 		responseString = HTTPServer.HTML_START + responseString + HTTPServer.HTML_END;

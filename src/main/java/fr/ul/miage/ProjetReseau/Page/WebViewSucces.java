@@ -1,21 +1,18 @@
 package fr.ul.miage.ProjetReseau.Page;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 
 import fr.ul.miage.ProjetReseau.HTTPServer;
+import fr.ul.miage.ProjetReseau.Main;
 
 public class WebViewSucces extends WebView {
 	
 	
-	public WebViewSucces(BufferedReader in, DataOutputStream out) {
-		super(in, out);
+	public WebViewSucces(BufferedReader in, DataOutputStream out,String host) {
+		super(in, out,host);
 	}
 	
 	
@@ -24,30 +21,53 @@ public class WebViewSucces extends WebView {
 	@Override
 	protected void sendResponse(String responseString) throws IOException {
 		
-		String statusLine = "HTTP/1.1 200 OK" + "\r\n";
+		String statusLine = "HTTP/1.1 200 OK" + System.getProperty("line.separator");
 		String serverdetails = "Server: Java HTTPServer";
 		String contentLengthLine = null;
-		String contentTypeLine = "Content-Type: text/html" + "\r\n";
+		String contentTypeLine = null;
 		FileInputStream fin = null;
 
-		Path temp = Files.createTempFile("resource-", ".ext");
-		Files.copy(Thread.currentThread().getContextClassLoader().getResourceAsStream(RESOURCES_LINK+responseString), temp, StandardCopyOption.REPLACE_EXISTING);
-		fin = new FileInputStream(temp.toString());
-		contentLengthLine = "Content-Length: " + Integer.toString(fin.available()) + "\r\n";
-		
-		if (!responseString.endsWith(".htm") && !responseString.endsWith(".html"))
-			contentTypeLine = "Content-Type: \r\n";
-		
+		File f = new File(Main.LINKRESOUCES + File.separator + site + File.separator + responseString);
+		String fileName = responseString;
+		if(!f.isDirectory()) {
+			fin = new FileInputStream(Main.LINKRESOUCES + File.separator + site + File.separator + responseString);
+			contentLengthLine = "Content-Length: " + Integer.toString(fin.available()) + System.getProperty("line.separator");
+
+			contentTypeLine = content_type(responseString);
+		}
+		else if(Main.ACCES_DIR){
+			StringBuilder sb = new StringBuilder(HTTPServer.HTML_START);
+			sb.append("<ul>");
+			String format = "<li><a href=%s> %s</li> %n";
+			File[] files = f.listFiles();
+			for(File file : files ){
+				sb.append(String.format(format,
+						"http://"+findURL( site )+ "/" + responseString.replace("\\","/") + file.getName(),
+						file.getName()));
+			}
+			sb.append("</ul>");
+			sb.append(HTTPServer.HTML_END);
+			responseString = sb.toString();
+			contentLengthLine = "Content-Length: " + responseString.length() + System.getProperty("line.separator");
+			contentTypeLine = "Content-Type: text/html" + "\r\n";
+		}
+		else {
+			new WebViewForbidden(inFromClient, outToClient, site).sendResponse("", "");
+			return;
+		}
+		System.out.println(statusLine + " " + fileName);
 		
 		outToClient.writeBytes(statusLine);
 		outToClient.writeBytes(serverdetails);
 		outToClient.writeBytes(contentTypeLine);
 		outToClient.writeBytes(contentLengthLine);
-		outToClient.writeBytes("Connection: close\r\n");
-		outToClient.writeBytes("\r\n");
+		outToClient.writeBytes("Connection: close"+System.getProperty("line.separator"));
+		outToClient.writeBytes(System.getProperty("line.separator"));
 
-		
-		sendFile(fin, outToClient);
+		if(fin != null)
+			sendFile(fin, outToClient);
+		else
+			outToClient.writeBytes(responseString);
 
 		outToClient.close();
 		

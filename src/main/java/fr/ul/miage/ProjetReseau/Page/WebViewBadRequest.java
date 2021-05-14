@@ -7,21 +7,21 @@ import java.io.DataOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-public class WebViewForbidden extends WebView {
+public class WebViewBadRequest extends WebView {
 
-    public WebViewForbidden(BufferedReader in, DataOutputStream out, String host) {
+    public WebViewBadRequest(BufferedReader in, DataOutputStream out, String host) {
         super(in, out,host);
     }
 
 
     @Override
     public void sendResponse(String responseString, String query) throws IOException {
-        sendResponse("<p> 403 Forbidden </p>");
+        sendResponse("<p> 500 Bad Request </p>");
     }
 
     @Override
     protected void sendResponse(String responseString) throws IOException {
-        String statusLine = "HTTP/1.1 403 Forbidden" + "\r\n";
+        String statusLine = "HTTP/1.1 500 Bad Request" + "\r\n";
         System.out.println(statusLine);
         String serverdetails = "Server: Java HTTPServer";
         String contentLengthLine = null;

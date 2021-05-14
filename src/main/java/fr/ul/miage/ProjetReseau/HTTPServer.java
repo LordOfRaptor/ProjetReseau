@@ -11,10 +11,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 
-import fr.ul.miage.ProjetReseau.Page.WebView;
-import fr.ul.miage.ProjetReseau.Page.WebViewForbidden;
-import fr.ul.miage.ProjetReseau.Page.WebViewNotFound;
-import fr.ul.miage.ProjetReseau.Page.WebViewSucces;
+import fr.ul.miage.ProjetReseau.Page.*;
 
 
 public class HTTPServer extends Thread {
@@ -32,10 +29,11 @@ public class HTTPServer extends Thread {
 		connectedClient = client;
 	}
 
+	@Override
 	public void run() {
 
 		try {
-			WebView wv;
+			WebView wv = null;
 			String file = null;
 			String query = null;
 			System.out.println("The Client " + connectedClient.getInetAddress() + ":" + connectedClient.getPort()
@@ -58,56 +56,67 @@ public class HTTPServer extends Thread {
 			System.out.println("The HTTP request string is ....");
 			while (inFromClient.ready()) {
 				responseBuffer.append(requestString + "<BR>");
-				System.out.println(requestString);
 				requestString = inFromClient.readLine();
 				if(requestString.contains(":")) {
 					String [] headerSeparator = requestString.split(":");
-					header.put(headerSeparator[0], headerSeparator[1]);
+					header.put(headerSeparator[0], headerSeparator[1].trim());
 				}
 			}
-			System.out.println(header);
-			
+			System.out.println(httpMethod + " " + httpQueryString);
+			String host = header.get("Host");
 			if (httpMethod.equals("GET")) {
 				
 				String fileName = httpQueryString.replaceFirst("/", "");
 				fileName = URLDecoder.decode(fileName,StandardCharsets.UTF_8);
-				// get the question mark
 
 				String[] seperatorQuestionMark = fileName.split("\\?");
 				
-				file = seperatorQuestionMark[0];
-				
-				InputStream iStream = Thread.currentThread().getContextClassLoader()
-						.getResourceAsStream("fr/ul/miage/ProjetReseau/" + file);
-				
-				if (iStream != null) {
-				
-					if(Thread.currentThread().getContextClassLoader()
-							.getResourceAsStream("fr/ul/miage/ProjetReseau/" + file + "/.htpasswd") != null) {
-						if(header.containsKey("Authorization")) {
-							query = header.get("Authorization");
+				file = seperatorQuestionMark[0] + File.separator;
+				file = toPath(host,file);
+				if (file != null) {
+					File f = new File(Main.LINKRESOUCES  + File.separator + WebView.chooseDirectory(host)+ File.separator + file);
+					String path = f.getAbsolutePath();
+					while (path != null) {
+						f = new File(path);
+						if (new File(path + File.separator + ".htpasswd").exists()) {
+							if (header.containsKey("Authorization")) {
+								query = header.get("Authorization");
+							}
+							wv = new WebViewUnauthorized(inFromClient, outToClient, WebView.chooseDirectory(host),path + File.separator + ".htpasswd"); //.sendResponse(file, query);
+
 						}
-						
-						wv = new WebViewForbidden(inFromClient, outToClient); //.sendResponse(file, query);
-						
-						
+						path = f.getParent();
 					}
-					else {
-						wv = new WebViewSucces(inFromClient, outToClient); //.sendResponse(file,query);
-					}
+					if (wv == null)
+						wv = new WebViewSucces(inFromClient, outToClient,WebView.chooseDirectory(host)); //.sendResponse(file,query);
+
 					
 				} else {
-					wv = new WebViewNotFound(inFromClient, outToClient); //.sendResponse("<p> 404 not found </p>", query);
+					wv = new WebViewNotFound(inFromClient, outToClient,WebView.chooseDirectory(host)); //.sendResponse("<p> 404 not found </p>", query);
 				}
 				wv.sendResponse(file, query);
 			} else {
-				wv =  new WebViewNotFound(inFromClient, outToClient);//.sendResponse("<p> 404 not found </p>", null);
+				wv =  new WebViewBadRequest(inFromClient, outToClient,WebView.chooseDirectory(host));//.sendResponse("<p> 404 not found </p>", null);
 				wv.sendResponse(file, query);
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	private String toPath(String host,String file) {
+		File f = new File(Main.LINKRESOUCES + File.separator + WebView.chooseDirectory(host) + File.separator + file);
+		if (f.exists()) {
+			if (f.isDirectory()) {
+				File f2 = new File(Main.LINKRESOUCES + File.separator + WebView.chooseDirectory(host) + File.separator + file + File.separator + "index.html");
+				if (f2.exists())
+					return file + "index.html";
+
+			}
+			return file;
+		}
+		return null;
 	}
 	
 	

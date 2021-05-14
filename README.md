@@ -17,16 +17,16 @@ thread = une connexion)
 - [ ] il doit être « bien écrit » : code documenté, maintenable, évolutif
 - [x] il doit afficher du log sur stdout : ip de l'appelant + requête
 - [x] il doit gérer le multisite (i.e. pouvoir héberger plusieurs domaines)
-- [ ] il doit pouvoir protéger une ressource par une authentification basique
+- [x] il doit pouvoir protéger une ressource par une authentification basique
   -   [x] un répertoire est protégé s'il contient un fichier .htpasswd
-  -   [ ] le fichier contient des lignes sous la forme « username:password_en_md5 »
-- [ ] il faut externaliser la configuration dans un fichier properties
-  -   [ ] répertoire racine où mettre les sites web, port tcp (80 par défaut)
+  -   [x] le fichier contient des lignes sous la forme « username:password_en_md5 »
+- [x] il faut externaliser la configuration dans un fichier properties
+  -   [x] répertoire racine où mettre les sites web, port tcp (80 par défaut)
 	
 Il doit implémenter une fonctionnalité « bonus » au choix :
  - [ ] gérer les server-side includes (#include et #exec)
  - [ ] générer du contenu dynamique à l'aide d'un programme externe (php, python, node)
- - [ ] gérer le listing des répertoires (doit pouvoir être désactivé par configuration)
+ - [x] gérer le listing des répertoires (doit pouvoir être désactivé par configuration)
  - [ ] compresser les ressources js et css en gzip
 Bien écrit
 Le code doit être documenté : les commentaires doivent être réguliers et pertinent, ne

@@ -48,3 +48,5 @@ hs_err_pid*
 /.idea/encodings.xml
 /.idea/compiler.xml
 /.idea/.gitignore
+/Ext/sites/
+/.idea/

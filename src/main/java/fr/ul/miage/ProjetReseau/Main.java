@@ -1,15 +1,6 @@
 package fr.ul.miage.ProjetReseau;
 
-import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -17,20 +8,43 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Properties;
 
 public class Main {
-	
-	
-	 static final int port=80;
 
-	 public static void main(String[] args) throws UnknownHostException, IOException
-	 {
-		 	ServerSocket Server = new ServerSocket(port, 10, InetAddress.getByName("192.168.1.21"));
-			System.out.println("TCPServer Waiting for client on port " + port);
-			while (true) {
-				Socket connected = Server.accept();
-				(new HTTPServer(connected)).start();
-			}
-	 }
+    public static String IPV4,LINKRESOUCES;
+    public static int PORT;
+    public static boolean ACCES_DIR;
+
+    public static void main(String[] args) throws UnknownHostException, IOException {
+        intializeProperties();
+
+        ServerSocket Server = new ServerSocket(PORT, 10, InetAddress.getByName(IPV4));
+        System.out.println("TCPServer Waiting for client on port " + PORT);
+        while (true) {
+            Socket connected = Server.accept();
+            (new HTTPServer(connected)).start();
+        }
+    }
+
+    public static void intializeProperties(){
+
+
+        File f = new File("config.properties");
+        try (InputStream input = new FileInputStream(f)) {
+
+            Properties prop = new Properties();
+            // load a properties file
+            prop.load(input);
+            // get the property value and print it out
+            IPV4 = prop.getProperty("ipV4");
+            PORT = Integer.parseInt(prop.getProperty("port")) ;
+            LINKRESOUCES = prop.getProperty("pathToSites");
+            ACCES_DIR = prop.getProperty("acces_dir").equals("true");
+
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
 
 }
