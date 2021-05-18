@@ -14,10 +14,7 @@ public class WebViewSucces extends WebView {
 	public WebViewSucces(BufferedReader in, DataOutputStream out,String host) {
 		super(in, out,host);
 	}
-	
-	
-	
-	
+
 	@Override
 	protected void sendResponse(String responseString) throws IOException {
 		
@@ -26,15 +23,17 @@ public class WebViewSucces extends WebView {
 		String contentLengthLine = null;
 		String contentTypeLine = null;
 		FileInputStream fin = null;
-
+		//Récupere le fichier que l'utilsiateur cherche à avoir
 		File f = new File(Main.LINKRESOUCES + File.separator + site + File.separator + responseString);
 		String fileName = responseString;
+		//Si le fichier n'est pas un directory le récupere et stock les différentes info
 		if(!f.isDirectory()) {
 			fin = new FileInputStream(Main.LINKRESOUCES + File.separator + site + File.separator + responseString);
 			contentLengthLine = "Content-Length: " + Integer.toString(fin.available()) + System.getProperty("line.separator");
 
 			contentTypeLine = content_type(responseString);
 		}
+		//Si c'est un directory on vérifie qu'on a le droit de lister les fichier
 		else if(Main.ACCES_DIR){
 			StringBuilder sb = new StringBuilder(HTTPServer.HTML_START);
 			sb.append("<ul>");
@@ -51,6 +50,7 @@ public class WebViewSucces extends WebView {
 			contentLengthLine = "Content-Length: " + responseString.length() + System.getProperty("line.separator");
 			contentTypeLine = "Content-Type: text/html" + "\r\n";
 		}
+		//sinon affiche un forbidden
 		else {
 			new WebViewForbidden(inFromClient, outToClient, site).sendResponse("", "");
 			return;

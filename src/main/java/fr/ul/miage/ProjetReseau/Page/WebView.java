@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public abstract class WebView {
 	
-	
+	//Stock les différents site
 	private static final String VERTI = "www.verti.miage";
 	private static final String DOPETROPE = "www.dopetrope.miage";
 	private static final String MAIN = "www.test.miage";
@@ -24,13 +24,30 @@ public abstract class WebView {
 		this.inFromClient = in;
 		this.outToClient = out;
 	}
-	
+
+	/**
+	 * S'occupe de renvoyer le bonne affichage
+	 * @param responseString le lien
+	 * @throws IOException
+	 */
 	protected abstract void sendResponse(String responseString) throws IOException;
-	
+
+	/**
+	 * S'occupe de renvoyer le bonne affichage
+	 * @param responseString le lien
+	 * @param query permet d'ajouter des options supplémentaires
+	 * @throws IOException
+	 */
 	public void sendResponse(String responseString,String query) throws IOException{
 		sendResponse(responseString);
 	}
-	
+
+	/**
+	 * Affiche ce que contient un fichier
+	 * @param fin le fichier
+	 * @param out la sortie
+	 * @throws IOException
+	 */
 	protected void sendFile(FileInputStream fin, DataOutputStream out) throws IOException {
 		byte[] buffer = new byte[1024];
 		int bytesRead;
@@ -41,6 +58,11 @@ public abstract class WebView {
 		fin.close();
 	}
 
+	/**
+	 * Renvoie le directory qui correpsond à l'host
+	 * @param host le host
+	 * @return
+	 */
 	public static String chooseDirectory(String host){
 		switch (host) {
 			case VERTI:
@@ -54,8 +76,13 @@ public abstract class WebView {
 
 	}
 
-	public static String findURL(String host){
-		switch (host) {
+	/**
+	 * renvoie l'url qui correspond au directory
+	 * @param directory le directory
+	 * @return
+	 */
+	public static String findURL(String directory){
+		switch (directory) {
 			case "verti":
 				return VERTI;
 			case "dopetrope":
@@ -64,6 +91,11 @@ public abstract class WebView {
 				return MAIN;
 		} }
 
+	/**
+	 * renvoie le bon content type en focntion du type de fichier
+	 * @param responseString le fichier
+	 * @return
+	 */
 	protected String content_type(String responseString){
 		String contentTypeLine = "Content-Type: " + System.getProperty("line.separator");
 		if (responseString.endsWith(".htm") || responseString.endsWith(".html"))

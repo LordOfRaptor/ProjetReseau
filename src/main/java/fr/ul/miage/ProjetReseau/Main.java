@@ -16,11 +16,13 @@ public class Main {
     public static int PORT;
     public static boolean ACCES_DIR;
 
-    public static void main(String[] args) throws UnknownHostException, IOException {
+    public static void main(String[] args) throws IOException {
+        //Initialise les propriétés
         intializeProperties();
-
+        //Crée un server socket avec le port de config.properties et l'adresse IP présent dand config.properties
         ServerSocket Server = new ServerSocket(PORT, 10, InetAddress.getByName(IPV4));
         System.out.println("TCPServer Waiting for client on port " + PORT);
+        //Boucle à l'infinie pour vérifier les connexion entrantes et les lance en thread
         while (true) {
             Socket connected = Server.accept();
             (new HTTPServer(connected)).start();
@@ -34,9 +36,8 @@ public class Main {
         try (InputStream input = new FileInputStream(f)) {
 
             Properties prop = new Properties();
-            // load a properties file
             prop.load(input);
-            // get the property value and print it out
+            // Stock les variables présente dans config.properties
             IPV4 = prop.getProperty("ipV4");
             PORT = Integer.parseInt(prop.getProperty("port")) ;
             LINKRESOUCES = prop.getProperty("pathToSites");
