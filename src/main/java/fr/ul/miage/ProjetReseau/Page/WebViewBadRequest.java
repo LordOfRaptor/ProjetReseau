@@ -4,13 +4,12 @@ import fr.ul.miage.ProjetReseau.HTTPServer;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 public class WebViewBadRequest extends WebView {
 
     public WebViewBadRequest(BufferedReader in, DataOutputStream out, String host) {
-        super(in, out,host);
+        super(in, out, host);
     }
 
 

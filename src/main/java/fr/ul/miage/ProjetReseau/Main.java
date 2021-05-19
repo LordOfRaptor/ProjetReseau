@@ -1,18 +1,17 @@
 package fr.ul.miage.ProjetReseau;
 
-import java.io.*;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.util.Date;
 import java.util.Properties;
 
 public class Main {
 
-    public static String IPV4,LINKRESOUCES;
+    public static String IPV4, LINKRESOUCES;
     public static int PORT;
     public static boolean ACCES_DIR;
 
@@ -29,7 +28,7 @@ public class Main {
         }
     }
 
-    public static void intializeProperties(){
+    public static void intializeProperties() {
 
 
         File f = new File("config.properties");
@@ -39,7 +38,7 @@ public class Main {
             prop.load(input);
             // Stock les variables présente dans config.properties
             IPV4 = prop.getProperty("ipV4");
-            PORT = Integer.parseInt(prop.getProperty("port")) ;
+            PORT = Integer.parseInt(prop.getProperty("port"));
             LINKRESOUCES = prop.getProperty("pathToSites");
             ACCES_DIR = prop.getProperty("acces_dir").equals("true");
 
